@@ -2,12 +2,11 @@ import * as mysql from 'mysql';
 import * as util from 'util';
  
 export var pool = mysql.createPool({
-  host:'localhost', 
-  user: 'root',
+  host:"localhost", 
+  user:"root",
   password: '',
-  database: 'netdb',
+  database:"netdb",
 });
-
 export const dbPool = {
    query: text => util.promisify(pool.query),
    pool: pool

@@ -1,4 +1,5 @@
 import * as nodemailer from "nodemailer";
+import { htmlTemp } from "./mail/requestTemplate"
 export  let statusCode =  {
     success : 200,
     badRequest : 400,
@@ -6,30 +7,30 @@ export  let statusCode =  {
 }
 export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
-export const logDirectory = process.env.LOG_DIR;
-export const secretkey = process.env.WEB_TOKEN_KEY;
-export const imageDirectory = process.env.IMG_DIR;
+export const logDirectory ='/home/bumblebee/my_project/workSpace/node_Session/backend/logs';
+export const secretkey = "nandha@2020";
+export const imageDirectory ='/home/bumblebee/my_project/workSpace/node_Session/backend/userDocs';
 
-export class sendMail {
-public async mailFromNodeMailer(toMailId:string,userName : string){
+export class SendMail {
+public async mailFromNodeMailer(toMailId:string,userName : string, id?:number,day?:number){
     try{
-        console.log('Email: '+toMailId +'userName : '+userName);
+        console.log('Email: '+toMailId +'userName : '+userName +'id:'+id);
         let transporter = await nodemailer.createTransport({
             host:  'smtp.gmail.com',
             port:  587,
             secure: false,
             auth: {
               user: 'nandhakumar270@gmail.com',
-              pass: 'ibtbab@login'
+              pass: 'strongpassword@login'
             }
           });
           let mailConfig = {
 
             from: 'nandhakumar270@gmail.com',
             to:  `${toMailId}`,
-            subject: `Hi Welcome to node`,
-            text: "Hello world?",
-            html: `Dear ${userName}`
+            subject: `Request Mail`,
+            text: `Hello ${userName}`,
+            html:htmlTemp(userName,id,day)
           };
 
         await transporter.sendMail(mailConfig);

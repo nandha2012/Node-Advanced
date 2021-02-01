@@ -14,7 +14,7 @@ if (!fs.existsSync(dir)) {
 
   let winston = require('winston');
   require('winston-daily-rotate-file');
- 
+// create transport which create logger file 
   let transport = new (winston.transports.DailyRotateFile)({
     filename: dir + '/%DATE%.log',
     datePattern: 'YYYY-MM-DD-HH',
@@ -26,7 +26,7 @@ if (!fs.existsSync(dir)) {
   transport.on('rotate', function(oldFilename, newFilename) {
     // do something fun
   });
- 
+ //create logger
   export default winston.createLogger({
     transports: [
       transport

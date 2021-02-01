@@ -1,15 +1,17 @@
-import {Request,Response} from 'express';
-import UserController from '../controller/user-controller';
-import {JwtAuthRoute} from '../middleware/jwt-auth-route';
+import UserController from '../com.controller/userController';
+import JobControl from '../com.controller/JobController';
+import { generateToken } from 'middleware/jwt-auth-route'
+import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as multer from 'multer';
 import { environment, imageDirectory } from '../config';
 
 let dir = imageDirectory;
-if (!dir) dir = path.resolve('images');
-
+console.log(`Image Dir:${dir}`);
+if (!dir) dir = path.resolve('userDocs');
 // create directory if it is not present
+
 if (!fs.existsSync(dir)) {
   // Create the directory if it does not exist
   fs.mkdirSync(dir);
@@ -17,7 +19,12 @@ if (!fs.existsSync(dir)) {
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null,dir);
+      if(file.fieldname === "userImage"){
+      cb(null,`${dir}/images`);
+      }
+      else{
+        cb(null,`${dir}/files`)
+      }
     },
     filename: function (req, file, cb) {
       cb(null, file.fieldname + '-' + Date.now()+'-'+file.originalname)
@@ -28,15 +35,15 @@ var storage = multer.diskStorage({
 //Routing 
 export class UserRoutes {
     public userController:UserController = new UserController;
- 
+    public jobControl:JobControl = new JobControl;
     public UserRoutes(app):void{
-            let jwtAuthRoute = new JwtAuthRoute();
-           app.route('/').get(jwtAuthRoute.checkAuthReq,this.userController.getUserList);
-           app.route('/add').post(upload.single('userImage'),this.userController.addUser);
-           app.route('/delete-user/:userId').delete(this.userController.deleteUser);
-           app.route('/get-user/:userId').get(this.userController.getUserById);
-           app.route('/updateUser').post(this.userController.updateUser);
-
-
+            app.route('/add').post(upload.fields([
+              {name:"userImage",maxCount:1},
+              {name:"userFile",maxCount:1}]),this.userController.addUser);
+            // app.route('/addJob').post(this.jobControl.addJob);
+            app.route(`/accept/data`).get(this.jobControl.acceptJob);
+            app.route(`/reject/data`).get(this.jobControl.rejectJob);
+            app.route('/assignJob').post(this.jobControl.assignJob);
+            app.route('/getJobList').post(this.jobControl.getJobList);
         }
 }
